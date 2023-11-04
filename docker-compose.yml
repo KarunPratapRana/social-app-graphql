@@ -1,0 +1,18 @@
+version: '3.4'
+
+services:
+  postgres:
+    container_name: social-app-db
+    image: postgres
+    ports:
+      - 5431:5431
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      # to mount db data in postgres_data
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_DB: threads
+      POSTGRES_PASSWORD: threads
+
+volumes:
+  postgres_data:
