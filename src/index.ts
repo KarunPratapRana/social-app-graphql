@@ -1,7 +1,8 @@
 import { ApolloServer } from '@apollo/server';
 import { expressMiddleware } from '@apollo/server/express4';
-import cors from 'cors';
+// import cors from 'cors';
 import express from 'express';
+import { prismaClient } from './lib/db.js'; //need to this issue, so that ts automatically compiles into js
 const app = express();
 
 const PORT = process.env.PORT || 8000;
@@ -14,11 +15,39 @@ const PORT = process.env.PORT || 8000;
                 hello: String
                 say(name: String): String
             }
+            type Mutation {
+                createUser(firstName: String!, lastName: String!, email: String!, password: String!): Boolean
+            }
         `,
         resolvers: {
             Query: {
                 hello: () => 'Hello i am a gql server',
                 say: (parent, { name } : { name: string } ) => `Hey ${name} how are you`
+            },
+            Mutation: {
+                createUser: async(_, 
+                    { 
+                        firstName, 
+                        lastName, 
+                        email, 
+                        password 
+                    }: { 
+                        firstName: string; 
+                        lastName: string;
+                        email: string;
+                        password: string
+                    }) => {
+                        await prismaClient.user.create({
+                            data: {
+                                firstName,
+                                lastName,
+                                email,
+                                password,
+                                salt: 'random_salt'
+                            }
+                        });
+                        return true
+                    }
             }
         }
     })

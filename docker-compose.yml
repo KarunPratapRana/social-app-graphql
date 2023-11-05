@@ -5,7 +5,7 @@ services:
     container_name: social-app-db
     image: postgres
     ports:
-      - 5431:5431
+      - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
       # to mount db data in postgres_data
