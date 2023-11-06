@@ -13,7 +13,7 @@ datasource db {
 model User {
   id String @id @default(uuid())
   firstName String @map("first_name") //dab key will be first_name but in code it will be firstName
-  lastName String @map("last_name")
+  lastName String? @map("last_name")
   profileImageUrl String? @map("profile_image_url")
   email String @unique
   password String
