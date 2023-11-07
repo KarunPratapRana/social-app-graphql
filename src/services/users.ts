@@ -1,6 +1,7 @@
 import { createHmac, randomBytes } from 'node:crypto';
 import { prismaClient } from '../lib/db.js';
 import JWT from "jsonwebtoken"
+import { GraphQLError } from 'graphql';
 const TOKEN = "c449c786743b9b502a43b3374c0157c2"
 
 export interface CreateUserPayload {
@@ -39,8 +40,12 @@ class UserService {
 
     }
 
-    private static getUserByEmail(email: string) {
+    public static getUserByEmail(email: string) {
         return prismaClient.user.findUnique({ where: { email }})
+    }
+
+    public static async decodeJWTToken(token: string) {
+        return JWT.verify(token, TOKEN)
     }
 
     public static async getUserToken(payload: GetUserTokenPayload) {
@@ -55,7 +60,12 @@ class UserService {
                 email: user.email
             }, TOKEN)
         } else {
-            throw new Error("Password is incorrect!")
+            throw new GraphQLError('Password is incorrect!', {
+                extensions: {
+                  code: 'BAD_REQUEST',
+                  http: { status: 400 },
+                },
+            });
         }
     }
 }
